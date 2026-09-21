@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from typing import List, Dict, Optional
 import chromadb
 from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
+from chromadb.utils import embedding_functions
 from dotenv import load_dotenv
 import time
 import re
@@ -32,9 +32,15 @@ class WebsiteKnowledgeBase:
         
         print(f" Using base URL: {self.base_url}")
         
-        # Lazy load embedding model to save memory
+        # Lightweight embedding: ChromaDB's default ONNX MiniLM (~80MB via onnxruntime,
+        # no PyTorch — fits small containers). Override with EMBEDDING_PROVIDER=gemini
+        # to use the Gemini embedding API instead.
         self._embedding_model = None
         self._model_name = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+        self._embedding_provider = os.getenv("EMBEDDING_PROVIDER", "chroma_default")
+        if self._embedding_provider == "gemini":
+            self._gemini_api_key = os.getenv("GOOGLE_API_KEY")
+            self._gemini_model = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
         
         # Use configurable ChromaDB path (for Railway volumes)
         chroma_path = os.getenv("CHROMA_DB_PATH", "./chroma_db")
@@ -70,9 +76,25 @@ class WebsiteKnowledgeBase:
         """Lazy load embedding model to save memory"""
         if self._embedding_model is None:
             print(f" Loading embedding model: {self._model_name}")
-            self._embedding_model = SentenceTransformer(self._model_name)
+            self._embedding_model = embedding_functions.DefaultEmbeddingFunction()
             print(" Embedding model loaded")
         return self._embedding_model
+    
+    def _gemini_embed(self, texts: List[str]) -> List[List[float]]:
+        """Embed texts via the Gemini embedding API (set EMBEDDING_PROVIDER=gemini)."""
+        import google.generativeai as genai
+        genai.configure(api_key=self._gemini_api_key)
+        result = genai.embed_content(
+            model=f"models/{self._gemini_model}",
+            content=texts,
+            output_dimensionality=384,
+        )
+        return result["embedding"] if isinstance(texts, str) else result["embeddings"]
+    
+    def _embed(self, texts: List[str]) -> List[List[float]]:
+        if self._embedding_provider == "gemini":
+            return self._gemini_embed(texts)
+        return [list(map(float, e)) for e in self.embedding_model(texts)]
     
     def scrape_page(self, url: str, timeout: int = 15) -> Optional[Dict[str, str]]:
         """Scrape content from a single page with better error handling"""
@@ -290,7 +312,7 @@ class WebsiteKnowledgeBase:
             
             # Generate embeddings (this is memory intensive)
             print(" Generating embeddings...")
-            embeddings = self.embedding_model.encode(documents).tolist()
+            embeddings = self._embed(documents)
             
             # Add to collection
             print(" Adding to ChromaDB...")
@@ -330,7 +352,7 @@ class WebsiteKnowledgeBase:
         """Search the knowledge base"""
         try:
             # Create query embedding
-            query_embedding = self.embedding_model.encode([query]).tolist()
+            query_embedding = self._embed([query])
             
             # Search ChromaDB
             results = self.collection.query(

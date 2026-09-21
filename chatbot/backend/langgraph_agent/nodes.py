@@ -1,4 +1,4 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph_agent.state import ChatState, ChatMessage
 from langgraph_agent.knowledge_base import WebsiteKnowledgeBase
@@ -10,10 +10,10 @@ import re
 
 load_dotenv()
 
-# Initialize LLM with correct model name
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
-    google_api_key=os.getenv("GOOGLE_API_KEY"),
+# Initialize LLM (Groq llama-3.3-70b — free & fast; set GOOGLE_API_KEY + swap class to fall back to Gemini)
+llm = ChatGroq(
+    model=os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
+    api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.7
 )
 
