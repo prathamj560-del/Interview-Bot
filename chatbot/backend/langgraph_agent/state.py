@@ -1,4 +1,5 @@
-from typing import TypedDict, Literal, List, Optional
+from typing_extensions import TypedDict
+from typing import Literal, List, Optional
 from datetime import datetime
 
 class InterviewParams(TypedDict, total=False):

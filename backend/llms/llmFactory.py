@@ -44,4 +44,17 @@ class LLMFactory:
 
     @staticmethod
     def get_all_providers():
-        return [ LLMFactory.groq(),LLMFactory.gemini(), LLMFactory.grok()]
+        """Return available LLM providers, skipping any whose API key is missing."""
+        providers = []
+        if GROQ_API_KEY:
+            providers.append(LLMFactory.groq())
+        if GOOGLE_API_KEY:
+            providers.append(LLMFactory.gemini())
+        if GROK_API_KEY:
+            providers.append(LLMFactory.grok())
+        if not providers:
+            raise Exception(
+                "No LLM provider configured. Set at least one of "
+                "GOOGLE_API_KEY, GROQ_API_KEY, or GROK_API_KEY in the environment."
+            )
+        return providers
