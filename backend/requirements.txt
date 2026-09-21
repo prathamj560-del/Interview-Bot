@@ -11,6 +11,11 @@ fastapi>=0.116.1,<0.117
 langchain>=0.3.27,<0.4
 langchain-community>=0.3.27,<0.4
 langchain-google-genai>=2.1.9,<3
+langchain-xai>=0.2.5
+langchain-groq>=0.3.8
+
+# Rate limiting
+slowapi>=0.1.10
 
 # MongoDB async driver
 motor>=3.7.1,<4
