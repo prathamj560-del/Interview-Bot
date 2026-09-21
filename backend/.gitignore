@@ -1,0 +1,11 @@
+.env
+.python-version
+temp_resume.pdf
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv
+
