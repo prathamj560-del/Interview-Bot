@@ -27,14 +27,16 @@ app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+def _get_cors_origins() -> list:
+    """Read CORS_ORIGINS env var (comma-separated); fall back to localhost defaults."""
+    import os
+    raw = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000")
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://interview-bot-wine.vercel.app",
-        "https://interview-bot-gypk.vercel.app"
-    ],
+    allow_origins=_get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

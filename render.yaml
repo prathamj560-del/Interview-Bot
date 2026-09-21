@@ -1,0 +1,59 @@
+# Render Blueprint — deploys both FastAPI services
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # Main backend API (resume parsing, interviews, dashboard)
+  - type: web
+    name: interviewbot-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: MONGODB_URL_KEY
+        sync: false
+      - key: MONGODB_DATABASE_NAME
+        value: InterviewBot
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: CORS_ORIGINS
+        sync: false
+
+  # AI Chatbot microservice (LangGraph + RAG)
+  - type: web
+    name: interviewbot-chatbot
+    runtime: python
+    rootDir: chatbot/backend
+    plan: free
+    buildCommand: pip install -r requirements.txt && playwright install chromium
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: MONGODB_URL
+        sync: false
+      - key: MONGODB_DATABASE_NAME
+        value: InterviewBot
+      - key: WEBSITE_BASE_URL
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: CHROMA_DB_PATH
+        value: /opt/render/project/src/chroma_db
+      - key: CORS_ORIGINS
+        sync: false

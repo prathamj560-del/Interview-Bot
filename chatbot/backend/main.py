@@ -47,9 +47,13 @@ app = FastAPI(title="Interview Bot Chatbot API", lifespan=lifespan)
 # -------------------------------------
 # CORS Middleware
 # -------------------------------------
+import os
+
+_raw_cors = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000", "https://interview-bot-wine.vercel.app"],
+    allow_origins=[origin.strip() for origin in _raw_cors.split(",") if origin.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

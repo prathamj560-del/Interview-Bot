@@ -72,9 +72,11 @@ Built with FastAPI, LangChain, LangGraph, MongoDB, and React, this project demon
 
 ## 🌐 Live Demo
 
-**Backend API**: [https://interview-bot-bali.onrender.com/docs](https://interview-bot-bali.onrender.com/docs)
+<!-- Update these URLs after deploying -->
 
-**Frontend**: [https://interview-bot-wine.vercel.app](https://interview-bot-wine.vercel.app)
+**Backend API**: _coming soon_
+
+**Frontend**: _coming soon_
 
 ---
 
