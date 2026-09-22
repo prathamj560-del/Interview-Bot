@@ -3,7 +3,7 @@ import { MessageCircle, X, Send, Loader2, Minimize2, Trash2 } from 'lucide-react
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Chatbot.css';
 
-const API_BASE_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://localhost:8001';
+const API_BASE_URL = import.meta.env.VITE_CHATBOT_URL || 'http://localhost:8001';
 
 const Chatbot = ({ 
   userId = 'guest', 
@@ -382,7 +382,7 @@ const Chatbot = ({
           </div>
 
           <div className="chatbot-footer">
-            <span>Powered by Gemini AI • {actuallyInInterview ? 'Help Mode' : 'Chat Mode'}</span>
+            <span>Powered by Groq AI • {actuallyInInterview ? 'Help Mode' : 'Chat Mode'}</span>
             {messages.length > 0 && (
               <span className="text-xs text-gray-500"> • {messages.length} msgs</span>
             )}

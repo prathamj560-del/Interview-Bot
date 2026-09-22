@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const CHATBOT_API = 'http://localhost:8001';
+const CHATBOT_API = import.meta.env.VITE_CHATBOT_URL || 'http://localhost:8001';
 
 export const usePageContentCapture = (currentQuestion = null, options = []) => {
   const location = useLocation();
