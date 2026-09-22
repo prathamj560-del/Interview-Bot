@@ -14,7 +14,8 @@ load_dotenv()
 llm = ChatGroq(
     model=os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
     api_key=os.getenv("GROQ_API_KEY"),
-    temperature=0.7
+    temperature=0.7,
+    max_tokens=int(os.getenv("GROQ_MAX_TOKENS", "800"))  # stay under Groq free-tier OTPM limit (1000)
 )
 
 # Initialize Knowledge Base
