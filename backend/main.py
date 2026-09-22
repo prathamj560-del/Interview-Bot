@@ -37,6 +37,7 @@ def _get_cors_origins() -> list:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_get_cors_origins(),
+    allow_origin_regex=r"https://[a-z0-9-]+\.vercel\.app",  # any Vercel deployment/preview URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

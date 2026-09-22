@@ -54,6 +54,7 @@ _raw_cors = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:30
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[origin.strip() for origin in _raw_cors.split(",") if origin.strip()],
+    allow_origin_regex=r"https://[a-z0-9-]+\.vercel\.app",  # any Vercel deployment/preview URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
