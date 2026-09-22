@@ -35,7 +35,7 @@ Built with FastAPI, LangChain, LangGraph, MongoDB, and React, this project demon
 ## 🚀 Features
 
 ### 🤖 AI-Powered Chatbot Assistant
-- **Intelligent Conversation**: Powered by Google Gemini and LangGraph for natural interactions
+- **Intelligent Conversation**: Powered by Groq (Llama 3.3) and LangGraph for natural interactions
 - **RAG-Based Responses**: Retrieval Augmented Generation using indexed website content
 - **Contextual Help**: Real-time assistance during interviews without revealing answers
 - **Multi-turn Setup**: Interactive questionnaire to configure personalized interviews
@@ -72,11 +72,24 @@ Built with FastAPI, LangChain, LangGraph, MongoDB, and React, this project demon
 
 ## 🌐 Live Demo
 
-<!-- Update these URLs after deploying -->
+> **🚀 Try it now**: [https://frontend-pj-192c.vercel.app](https://frontend-pj-192c.vercel.app)
 
-**Backend API**: _coming soon_
+| Service | Live URL | API Docs |
+|---------|----------|----------|
+| **Frontend** (React + Vite) | [frontend-pj-192c.vercel.app](https://frontend-pj-192c.vercel.app) | — |
+| **Main API** (FastAPI) | [interviewbot-api-j1zy.onrender.com](https://interviewbot-api-j1zy.onrender.com) | [Swagger UI](https://interviewbot-api-j1zy.onrender.com/docs) |
+| **Chatbot API** (LangGraph) | [interviewbot-chatbot.onrender.com](https://interviewbot-chatbot.onrender.com) | [Swagger UI](https://interviewbot-chatbot.onrender.com/docs) |
 
-**Frontend**: _coming soon_
+### ☁️ Deployment Architecture
+
+| Component | Platform |
+|-----------|----------|
+| Frontend (React + Vite) | Vercel |
+| Main API (FastAPI + LangChain) | Render |
+| Chatbot (FastAPI + LangGraph) | Render |
+| Database | MongoDB Atlas |
+
+> ⚠️ **Note**: Backends run on Render's free tier — the first request after ~15 min of inactivity may take **~50 seconds** while the server wakes up (cold start). Subsequent requests are fast.
 
 ---
 
@@ -89,14 +102,15 @@ Built with FastAPI, LangChain, LangGraph, MongoDB, and React, this project demon
 | **FastAPI** | High-performance async API framework | 0.116+ |
 | **LangGraph** | AI conversation flow and state management | 0.2+ |
 | **LangChain** | LLM integration and orchestration | 0.3+ |
-| **Google Gemini** | Large language model for AI responses | 1.5 Pro |
+| **Groq (Llama 3.3)** | Large language model for AI responses | Latest |
+| **Google Gemini** | Optional fallback LLM | 1.5+ |
 | **ChromaDB** | Vector database for RAG implementation | 0.4+ |
 | **MongoDB** | Database for user data and chat history | Latest |
 | **Motor** | Async MongoDB driver | 3.7+ |
 | **PyJWT** | JWT token authentication | 2.10+ |
 | **PyPDF** | Resume PDF processing | 5.9+ |
 | **ReportLab** | PDF report generation | 4.0+ |
-| **Sentence Transformers** | Text embeddings | 2.3+ |
+| **ChromaDB Default Embeddings** | Text embeddings (ONNX MiniLM) | 1.0+ |
 | **BeautifulSoup4** | Web scraping for content indexing | 4.12+ |
 | **Passlib & Bcrypt** | Password hashing | 1.7.4 |
 
@@ -116,8 +130,9 @@ Built with FastAPI, LangChain, LangGraph, MongoDB, and React, this project demon
 | **React Toastify** | Toast notifications | 11.0+ |
 
 ### AI & ML Stack
-- **Google Gemini 1.5 Pro** - Main LLM for chatbot and question generation
-- **all-MiniLM-L6-v2** - Sentence embeddings for RAG
+- **Groq (Llama 3.3 70B)** - Main LLM for chatbot and question generation
+- **Google Gemini** - Optional fallback LLM
+- **all-MiniLM-L6-v2 (ONNX via ChromaDB)** - Sentence embeddings for RAG
 - **ChromaDB** - Vector similarity search
 - **LangGraph** - Stateful conversation graphs
 - **LangChain** - LLM orchestration and tools
@@ -166,7 +181,7 @@ Built with FastAPI, LangChain, LangGraph, MongoDB, and React, this project demon
 ┌─────────────────┐                          ┌─────────────────┐
 │ Store in        │                          │ Generate        │
 │ MongoDB         │                          │ Response        │
-│ (Resume DB)     │                          │ (Gemini LLM)    │
+│ (Resume DB)     │                          │ (Groq LLM)      │
 └────────┬────────┘                          └────────┬────────┘
          │                                            │
          │                                            ▼
@@ -465,7 +480,7 @@ interview-bot/
 │  └──────────────────────────────────────────────────────────┘  │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │         Google Gemini LLM (nodes.py)                      │  │
+│  │           Groq LLM (nodes.py)                              │  │
 │  │  • Intent classification                                  │  │
 │  │  • Response generation                                    │  │
 │  │  • Context understanding                                  │  │
@@ -495,7 +510,7 @@ Search ChromaDB for relevant content
     ↓
 Retrieve top matching documents
     ↓
-Generate response using context + Gemini
+Generate response using context + Groq
     ↓
 Return answer: "To upload your resume, go to..."
 ```
@@ -552,7 +567,7 @@ Return: "REST stands for Representational State Transfer..."
 - **Python**: 3.9 or higher
 - **Node.js**: 16.x or higher
 - **MongoDB**: Atlas account (free tier works)
-- **Google Gemini API**: API key from Google AI Studio
+- **Groq**: Free API key from [console.groq.com](https://console.groq.com/keys)
 
 ### Step 1: Clone the Repository
 
@@ -589,7 +604,7 @@ cp .env.example .env
 Edit `backend/.env`:
 ```env
 MONGODB_URL="mongodb+srv://username:password@cluster.mongodb.net/"
-GOOGLE_API_KEY="your-gemini-api-key"
+GROQ_API_KEY="your-groq-api-key"
 MONGODB_DATABASE_NAME="InterviewBot"
 JWT_SECRET_KEY="your-secret-key-minimum-32-characters-long"
 JWT_ALGORITHM="HS256"
@@ -610,11 +625,10 @@ cp .env.example .env
 
 Edit `chatbot/backend/.env`:
 ```env
-GOOGLE_API_KEY="your-gemini-api-key"
+GROQ_API_KEY="your-groq-api-key"
 MONGODB_URL="mongodb+srv://username:password@cluster.mongodb.net/"
 MONGODB_DATABASE_NAME="InterviewBot"
 WEBSITE_BASE_URL="http://localhost:5173"
-EMBEDDING_MODEL="all-MiniLM-L6-v2"
 ```
 
 **Important**: Index website content (one-time setup)
@@ -687,8 +701,8 @@ Visit `http://localhost:5173` in your browser. You should see the InterviewBot l
 MONGODB_URL="mongodb+srv://username:password@cluster.mongodb.net/"
 MONGODB_DATABASE_NAME="InterviewBot"
 
-# Google Gemini API
-GOOGLE_API_KEY="your-gemini-api-key"
+# LLM API (Groq — free key at console.groq.com)
+GROQ_API_KEY="your-groq-api-key"
 
 # JWT Configuration
 JWT_SECRET_KEY="your-very-long-secret-key-minimum-32-characters"
@@ -701,8 +715,8 @@ CORS_ORIGINS="http://localhost:5173,http://localhost:3000"
 
 #### Chatbot Backend `.env`
 ```env
-# Google Gemini API
-GOOGLE_API_KEY="your-gemini-api-key"
+# LLM API (Groq — free key at console.groq.com)
+GROQ_API_KEY="your-groq-api-key"
 
 # MongoDB Configuration
 MONGODB_URL="mongodb+srv://username:password@cluster.mongodb.net/"
@@ -710,9 +724,6 @@ MONGODB_DATABASE_NAME="InterviewBot"
 
 # Website Configuration
 WEBSITE_BASE_URL="http://localhost:5173"
-
-# Embedding Model
-EMBEDDING_MODEL="all-MiniLM-L6-v2"
 
 # ChromaDB Configuration (optional)
 CHROMA_DB_PATH="./chroma_db"

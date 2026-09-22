@@ -1,6 +1,8 @@
 # Interview Bot - AI Chatbot with LangGraph
 
-An intelligent chatbot powered by Google Gemini and LangGraph that helps students with interview preparation.
+An intelligent chatbot powered by Groq (Llama 3.3) and LangGraph that helps students with interview preparation.
+
+> 🌐 **Live**: https://interviewbot-chatbot.onrender.com/docs (part of [InterviewBot](https://frontend-pj-192c.vercel.app))
 
 ## Features
 
@@ -10,7 +12,7 @@ An intelligent chatbot powered by Google Gemini and LangGraph that helps student
 3. **Contextual Help** - Provide explanations during interviews
 
 🤖 **AI Capabilities:**
-- Natural language understanding with Google Gemini
+- Natural language understanding with Groq (Llama 3.3 70B)
 - Website content indexing for accurate answers
 - Stateful conversations with LangGraph
 - Smart mode detection and routing
@@ -26,7 +28,8 @@ An intelligent chatbot powered by Google Gemini and LangGraph that helps student
 - FastAPI
 - LangGraph (conversation flow)
 - LangChain (LLM integration)
-- Google Gemini API
+- Groq API (Llama 3.3)
+- Google Gemini API (optional fallback)
 - ChromaDB (vector database)
 - MongoDB (chat history)
 
@@ -122,11 +125,10 @@ function TestPage() {
 Create `.env` file in `chatbot/backend/`:
 
 ```env
-GOOGLE_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 MONGODB_URL=mongodb+srv://...
 MONGODB_DATABASE_NAME=InterviewBot
 WEBSITE_BASE_URL=http://localhost:5173
-EMBEDDING_MODEL=all-MiniLM-L6-v2
 ```
 
 ## API Endpoints
@@ -263,8 +265,9 @@ setup_steps = [
 Edit `langgraph_agent/nodes.py`:
 
 ```python
-llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro",  # Change model here
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",  # Change model here
+    api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.7
 )
 ```
@@ -334,7 +337,7 @@ MIT License
 ## Credits
 
 - Built with ❤️ for Interview Bot
-- Powered by Google Gemini AI
+- Powered by Groq AI (Llama 3.3)
 - LangGraph for conversation flow
 - ChromaDB for knowledge base
 
